@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'www.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gxb_db',
+        'NAME': 'gaoxiaoben',
         'USER': 'root',
         'PASSWORD': 'root',
         'HOST': '127.0.0.1',
