@@ -25,7 +25,7 @@ SECRET_KEY = '6(64s_s2n1$+5#73srwghn7imu1&*skpws(piefgq%!rfhn4xi'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.wh14.club']
+ALLOWED_HOSTS = ['www.wh14.club','119.29.62.85']
 
 
 # Application definition
@@ -117,7 +117,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True 不适用标准时间
 DEFAULT_CHARSET='utf-8'
 
 # Static files (CSS, JavaScript, Images)

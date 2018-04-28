@@ -1,5 +1,7 @@
 from django.db import models
 from system.storage import ImageStorage
+# from tinymce.models import HTMLField
+# from ckeditor.fields import RichTextField
 #用户表
 class User(models.Model):
     oppen_id = models.CharField('用户编号',max_length = 200)
@@ -56,14 +58,14 @@ class College(models.Model):
 #学校专业表
 class professional(models.Model):
 	profes_id  = models.CharField('专业编号',max_length = 100,primary_key = True)
-	profes_name = models.CharField('专业名称',max_length = 200)
-	related = models.CharField("相关专业",max_length = 600,null = True)
-	profess_class  = models.CharField("科类",max_length = 300,null = True)
-	main_class = models.TextField("主干学科",null = True)
-	practice = models.TextField("实践教学",null = True)
-	objective = models.TextField("培养目标",null = True)
-	tra_require = models.TextField("培养要求",null = True)
-	direction = models.TextField("就业方向",null = True)
+	profes_name = models.CharField('专业名称',max_length = 400)
+	related = models.CharField("专业介绍",max_length = 1000,null = True,blank=True)
+	profess_class  = models.CharField("专业类别",max_length = 300,null = True,blank=True)
+	main_class = models.CharField("学科",max_length = 300,null = True,blank=True)
+	practice = models.CharField("学习课程",max_length = 1000,null = True,blank=True)
+	objective = models.CharField("培养目标",max_length = 1000,null = True,blank=True)
+	tra_require = models.CharField("培养要求",max_length = 1000,null = True,blank=True)
+	direction = models.CharField("就业前景",max_length = 1000,null = True,blank=True)
 	def __str__(self):
 		return self.profes_name
 
@@ -96,36 +98,36 @@ class BatchLine(models.Model):
 		return self.fare_year
 
 	class Meta:
-		verbose_name = '历年批次线'
-		verbose_name_plural = '历年批次线'
+		verbose_name = '地区批次线'
+		verbose_name_plural = '地区批次线'
 
 #院校录取线
-class EnrollLine(models.Model):
-	enroll_year = models.CharField('年份',max_length = 4,null = True)
-	batch = models.CharField('录取批次',max_length = 100,null = True)
-	art_science = models.CharField('文理科',max_length = 50,null = True)
-	highest_score =  models.FloatField('最高分',null = True) 
-	minimum_score =  models.FloatField('最低分',null = True)
-	average_score =  models.FloatField('平均分',null = True)
-	school = models.ForeignKey(School,on_delete = models.CASCADE)
+# class EnrollLine(models.Model):
+# 	enroll_year = models.CharField('年份',max_length = 4,null = True)
+# 	batch = models.CharField('录取批次',max_length = 100,null = True)
+# 	art_science = models.CharField('文理科',max_length = 50,null = True)
+# 	highest_score =  models.FloatField('最高分',null = True) 
+# 	minimum_score =  models.FloatField('最低分',null = True)
+# 	average_score =  models.FloatField('平均分',null = True)
+# 	school = models.ForeignKey(School,on_delete = models.CASCADE)
 
-	def __str__(self):
-		return self.batch
+# 	def __str__(self):
+# 		return self.batch
 
-	class Meta:
-		verbose_name = '院校录取线'
-		verbose_name_plural = '院校录取线'
+# 	class Meta:
+# 		verbose_name = '院校录取线'
+# 		verbose_name_plural = '院校录取线'
  
 #提问者
 class Questions(models.Model):
-	que_tittle = models.CharField('标题',max_length = 300)
+	que_tittle = models.CharField('标题',max_length = 300,null = True)
 	que_text = models.TextField('问题内容',null = True)
 	questioner = models.CharField('提问者',max_length = 200)
-	que_time = models.DateField('提问时间')
+	que_time = models.DateTimeField('提问时间')
 	classify = models.CharField('问题分类',max_length = 200,null =True)
 
 	def __str__(self):
-		return self.que_tittle
+		return self.questioner
 
 	class Meta:
 		verbose_name = '用户提的问题'
@@ -135,7 +137,7 @@ class Questions(models.Model):
 class queAnswer(models.Model):
 	question = models.ForeignKey(Questions,on_delete = models.CASCADE)
 	answers = models.CharField('回复者',max_length = 200)
-	ans_time = models.DateField('回复时间')
+	ans_time = models.DateTimeField('回复时间')
 	ans_text = models.TextField('回答内容',null = True)
 
 	def __str__(self):
@@ -194,7 +196,7 @@ class Article(models.Model):
 class readCollect(models.Model):
 	article = models.ForeignKey(Article,on_delete = models.CASCADE)
 	user  =models.CharField("阅读用户",max_length = 200,null = True)
-	read_date = models.DateField("时间",null = True)
+	read_date = models.DateTimeField("时间",null = True)
 	read_collect = models.CharField("阅读或收藏",max_length = 4)
 
 
@@ -205,9 +207,10 @@ class readCollect(models.Model):
 #消息表
 class news(models.Model):
 	user = models.ForeignKey(User,on_delete = models.CASCADE)
-	new_context = models.TextField("消息内容")
-	new_date = models.DateField("消息时间")
+	new_context = models.CharField("回答者主键",max_length = 200)
+	new_date = models.DateTimeField("消息时间")
 	readed = models.CharField("是否已读",max_length = 4,null = True)
+	question = models.CharField("问题编号",max_length = 200,null = True)
 
 	class Meta:
 		verbose_name = '消息表'
@@ -215,3 +218,96 @@ class news(models.Model):
 	def __str__(self):
 		return self.new_context
 
+
+class readRecord(models.Model):
+	article = models.ForeignKey(Article,on_delete = models.CASCADE)
+	open_id  =models.CharField("阅读用户",max_length = 200,null = True)
+
+	class Meta:
+		verbose_name = '文章浏览记录'
+		verbose_name_plural = '文章浏览记录'
+
+class majorScore(models.Model):
+	major_name = models.CharField("专业名称",max_length = 200,null = True)
+	school_name = models.CharField("高校名称",max_length = 200,null = True)
+	aver_score = models.CharField("平均分",max_length = 50,null = True)
+	highest = models.CharField("最高分",max_length = 50,null = True)
+	student_loca = models.CharField("考生地区",max_length = 100,null = True)
+	category = models.CharField("科别",max_length = 50,null = True)
+	par_year = models.CharField("年份",max_length = 10, null = True)
+	batch = models.CharField("批次",max_length = 100,null = True)
+
+	class Meta:
+		verbose_name = '专业录取线'
+		verbose_name_plural = '专业录取线'
+
+
+class collegeLines(models.Model):
+	enroll_year = models.CharField('年份',max_length = 10,null = True)
+	batch = models.CharField('录取批次',max_length = 100,null = True)
+	art_science = models.CharField('文理科',max_length = 50,null = True)
+	highest_score =  models.CharField('最高分',max_length = 50,null = True) 
+	minimum_score =  models.CharField('最低分',max_length = 50,null = True)
+	average_score =  models.CharField('平均分',max_length = 50,null = True)
+	enrill_num = models.CharField('录取人数',max_length = 50,null = True)
+	school_name = models.CharField('学校名称',max_length = 200,null = True)
+
+	class Meta:
+		verbose_name = '院校分数线'
+		verbose_name_plural = '院校分数线'
+
+
+class specialtyScore(models.Model):
+	major_name = models.CharField("专业名称",max_length = 200,null = True)
+	school_name = models.CharField("高校名称",max_length = 200,null = True)
+	aver_score = models.CharField("平均分",max_length = 50,null = True)
+	highest = models.CharField("最高分",max_length = 50,null = True)
+	minimum = models.CharField("最低分",max_length = 50,null = True)
+	student_loca = models.CharField("考生地区",max_length = 100,null = True)
+	category = models.CharField("科别",max_length = 50,null = True)
+	par_year = models.CharField("年份",max_length = 10, null = True)
+	batch = models.CharField("批次",max_length = 100,null = True)
+
+	class Meta:
+		verbose_name = '专业分数线'
+		verbose_name_plural = '专业分数线'
+
+class EnrollLine(models.Model):
+	enroll_year = models.CharField('年份',max_length = 10,null = True)
+	batch = models.CharField('录取批次',max_length = 100,null = True)
+	art_science = models.CharField('文理科',max_length = 50,null = True)
+	highest_score =  models.CharField('最高分',max_length = 50,null = True) 
+	minimum_score =  models.CharField('最低分',max_length = 50,null = True)
+	average_score =  models.CharField('平均分',max_length = 50,null = True)
+	enrill_num = models.CharField('录取人数',max_length = 50,null = True)
+	school_name = models.CharField('学校名称',max_length = 200,null = True)
+	province = models.CharField('考生地区',max_length = 200,null = True)
+
+	class Meta:
+		verbose_name = '高校分数线'
+		verbose_name_plural = '高校分数线'
+
+# class KNSVNHistory(models.Model):
+#     revision = models.IntegerField(verbose_name=u"修订版本", blank=True, null=True)
+#     value = models.TextField(verbose_name=u"SVN属性值", blank=False, null=False, default=u"")
+#     repo = models.CharField(max_length=100, verbose_name=u"SVN仓库", blank=False, null=False)
+#     ctime = models.DateTimeField(verbose_name=u"创建时间", auto_now_add=True, )
+#     mtime = models.DateTimeField(verbose_name=u"修改时间", auto_now=True, )
+
+#     class Meta:
+#         ordering = ['ctime']
+
+#     def __str__(self):
+#         return self.value
+
+# class ImportFile(models.Model):
+
+#     file = models.FileField(upload_to='./File/')
+#     name = models.CharField(max_length=50, verbose_name=u'文件名')
+
+#     class Meta:
+#         ordering = ['name']
+
+#     def __str__(self):
+#         return self.name
+			
