@@ -168,6 +168,22 @@ def api(req):
 			searchm = req.GET['searchm']
 			return majorScore(start,pageSize,searchm,searchc)
 
+		if ac == 'enrollSchoolSearch':
+			search = req.GET['search']
+			return enrollSchoolSearch(search)
+
+		if ac == 'getNature':
+			return getNature()
+
+		if ac == 'enrollScoreSearch':
+			school = req.GET['school']
+			year = req.GET['year']
+			batch = req.GET['batch']
+			artsci = req.GET['artsci']
+			start = req.GET['start']
+			pageSize = req.GET['pageSize']
+			return enrollScoreSearch(school,year,batch,artsci,start,pageSize)
+
 
 			
 
@@ -742,6 +758,74 @@ def majorScore(start,pageSize,searchm,searchc):
 	result += "]}"
 
 	return HttpResponse(result,content_type = "application/json")
+
+def enrollSchoolSearch(search):
+	cursor = connection.cursor()
+	cursor.execute("select school_name from home_enrollline where school_name like '%"+search+"%' group by school_name limit 0,14")
+	# schools = list(models.EnrollLine.objects.values('school_name').filter(school_name__icontains=search )[:14])
+	# data = json.dumps(schools)
+	rows = dictfetchall(cursor)
+	if rows:
+		result ="{\"schoolist\":["
+		for i in range(len(rows)):
+			result += "{\"name\":\""+rows[i]['school_name']+"\"}"
+			if i<(len(rows)-1):
+				result += ","
+		result += "]}"
+		return HttpResponse(result,content_type = "application/json")
+	else:
+		return HttpResponse("{}")
+	# return HttpResponse(data,content_type = "application/json")
+
+def getNature():
+	cursor =connection.cursor()
+	cursor.execute("select batch from home_enrollline group by batch order by batch desc")
+	batch_rows = dictfetchall(cursor)
+
+	yearcur = connection.cursor()
+	yearcur.execute("select enroll_year from home_enrollline group by enroll_year order by enroll_year desc")
+	year_rows = dictfetchall(yearcur)
+
+	result = "{"
+	if batch_rows:
+		result += "\"batchlist\":["
+		for i in range(len(batch_rows)):
+			result += "\""+batch_rows[i]['batch']+"\""
+			if i <(len(batch_rows)-1):
+				result += ","
+		result += "]"
+
+	if year_rows:
+		result += ",\"yearlist\":["
+		for i in range(len(year_rows)):
+			result +="\""+ year_rows[i]['enroll_year']+"\""
+			if i < (len(year_rows)-1):
+				result += ","
+		result += "]"
+	result +="}"
+	return HttpResponse(result,content_type = "application/json")
+
+def enrollScoreSearch(school,year,batch,artsci,start,pageSize):
+	cursor = connection.cursor()
+	cursor.execute("select * from home_enrollline where enroll_year like '%"+year+"%' and batch like '%"+batch+"%' and school_name like '%"+school+"%' and art_science like '%"+artsci+"%' order by enroll_year desc limit "+start+","+pageSize)
+	rows = dictfetchall(cursor)
+	result = "{\"scorelist\":["
+	for i in range(len(rows)):
+		result += "{\"enrollyear\":\""+rows[i]['enroll_year']+"\","
+		result += "\"batch\":\""+rows[i]['batch']+"\","
+		result += "\"artsci\":\""+rows[i]['art_science']+"\","
+		result += "\"highest\":\""+rows[i]['highest_score']+"\","
+		result += "\"minnum\":\""+rows[i]['minimum_score']+"\","
+		result += "\"schname\":\""+rows[i]['school_name']+"\","
+		result += "\"province\":\""+rows[i]['province']+"\","
+		result += "\"avarge\":\""+rows[i]['average_score']+"\"}"
+		if i <(len(rows)-1):
+			result += ","
+	result += "]}"
+	return HttpResponse(result,content_type = "application/json")
+
+
+
 
 
 def dictfetchall(cursor):

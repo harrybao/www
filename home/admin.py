@@ -93,10 +93,11 @@ class AuthProfess(admin.ModelAdmin):
 	list_per_page = 10
 	search_fields  =('profes_name','main_class')
 
-# class AuthEnroll(admin.ModelAdmin):
-# 	list_display = ('enroll_year','batch','art_science','highest_score','minimum_score','average_score')
-# 	fields = (('enroll_year','batch'),('art_science','school'),
-# 				('highest_score','minimum_score','average_score'))
+class AuthEnroll(admin.ModelAdmin):
+	list_display = ('enroll_year','school_name','batch','art_science','highest_score','minimum_score','average_score')
+	list_per_page = 10
+	ordering = ('-enroll_year',)
+
 
 class AuthBatch(admin.ModelAdmin):
 	list_display = ('fare_year','fare_lend','fare_batch','art_science','control_line')
@@ -151,8 +152,8 @@ admin.site.register(models.School,AuthSchool)
 admin.site.register(models.professional,AuthProfess)
 admin.site.register(models.majorScore,AuthScore)
 admin.site.register(models.BatchLine,AuthBatch)
-# admin.site.register(models.EnrollLine,AuthEnroll)
-admin.site.register(models.collegeLines,AuthCollegeLine)
+admin.site.register(models.EnrollLine,AuthEnroll)
+# admin.site.register(models.collegeLines,AuthCollegeLine)
 # admin.site.register(models.Questions,AuthQuestions)
 admin.site.register(models.Article,AuthArticle)
 admin.site.register(models.digital,AuthDigital)
